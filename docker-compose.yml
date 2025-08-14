@@ -3,7 +3,7 @@ services:
   web:
     build: .
     ports:
-      - "3000:3000"
+      - "${HOST_PORT}:3000"
     environment:
       - NODE_ENV=production
       - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT}
