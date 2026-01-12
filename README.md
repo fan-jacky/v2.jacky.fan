@@ -39,6 +39,13 @@ cp .env.local.template .env.local
 yarn dev
 ```
 
+Build for Production:
+
+```bash
+# Build the project
+docker composer build --no-cache && docker composer up -d
+```
+
 ## Learn More
 
 This project uses the following tech:
