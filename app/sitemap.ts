@@ -1,9 +1,14 @@
 import type { MetadataRoute } from 'next'
 
-const api = `${process.env.STRAPI_URL}/api/`;
+const STRAPI_URL = process.env.STRAPI_URL;
+const api = STRAPI_URL ? `${STRAPI_URL}/api/` : null;
 const siteUrl = "https://jacky.fan";
 
 async function getData(path: string) {
+    if (!api) {
+        return { data: [] } as any;
+    }
+
     const res = await fetch(`${api}${path}`);
 
     if (!res.ok) {
@@ -42,6 +47,10 @@ async function getProjectPages () {
 }
  
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    if (!STRAPI_URL) {
+        // Fallback minimal sitemap when content API is not configured
+        return [{ url: siteUrl, changeFrequency: 'monthly', priority: 1 }];
+    }
 
     const pages = await getPages();
     const projectPages = await getProjectPages();
