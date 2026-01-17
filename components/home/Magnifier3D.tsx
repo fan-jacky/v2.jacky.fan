@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useRef, useState, useEffect, useContext } from "react"
+import React, { Suspense, useRef, useState, useEffect, useContext } from "react"
 import { Canvas } from "@react-three/fiber"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { calcRotation } from "@/helpers/calcRotation";

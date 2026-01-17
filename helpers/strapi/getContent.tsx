@@ -10,7 +10,7 @@ import { AboutMeSection, HeroSection } from "@/components/home/sections";
 import type { PageContentType } from "@/interfaces/ContentBlockProps";
 
 function getContents(data: PageContentType[] | null | undefined) {
-    if (!data || !Array.isArray(data)) return <></>;
+    if (!data || !Array.isArray(data)) return null;
 
     return data.map((block: PageContentType, i: number) => {
         switch (block.__component) {
