@@ -61,6 +61,6 @@ export interface PageAboutMeSectionBlock {
   rightTitle: string;
   contents: any[];
   techs: any[];
-  btnLinks: any[];
+  btnLinks: string;
   btnText: string;
 }
