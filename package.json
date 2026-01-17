@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "docker:build": "docker compose build --no-cache",
-    "docker:up": "docker compose up -d"
+    "docker:up": "docker compose up -d",
+    "deploy": "chmod +x ./scripts/deploy.sh && ./scripts/deploy.sh"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
