@@ -35,6 +35,9 @@ export default function ContactForm() {
             setIsLoading(true);
             
             // Execute reCAPTCHA
+            if (!executeRecaptcha) {
+                throw new Error('reCAPTCHA is not initialized');
+            }
             const token = await executeRecaptcha('contact_form');
             
             // Send to backend API
