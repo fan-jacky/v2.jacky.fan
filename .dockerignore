@@ -1,4 +1,29 @@
-Dockerfile
+# VCS
+.git
+.git/**
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Next.js build outputs
+.next
+out
+dist
+.cache
+
+# Editor/OS
+.vscode
+.DS_Store
+
+# Tests/Coverage
+coverage
+
+# Docker/Compose extras
+docker-compose.override.ymlDockerfile
 .dockerignore
 node_modules
 npm-debug.log
