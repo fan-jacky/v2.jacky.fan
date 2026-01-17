@@ -1,0 +1,12 @@
+services:
+  web:
+    image: ${IMAGE_NAME}
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
+      - GA_ID=${GA_ID}
+      - STRAPI_URL=${STRAPI_URL}
+    restart: unless-stopped 
