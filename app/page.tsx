@@ -1,57 +1,70 @@
 import { Page } from '@/components/basic'
 import { getContents } from '@/helpers/strapi'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import type { Metadata, ResolvingMetadata } from 'next';
+import { redirect, notFound } from 'next/navigation'
+import type { Metadata, ResolvingMetadata } from 'next'
 
 type Props = {
   params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
-  const endpoint = `${process.env.STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/`;
-  const { data } = await fetch(endpoint).then((res) => res.json())
+export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  try {
+    const endpoint = `${process.env.STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/`;
+    const response = await fetch(endpoint, { next: { revalidate: 3600 } });
+    
+    if (!response.ok) throw new Error("Failed to fetch metadata");
+    
+    const { data } = await response.json();
 
-  if (!data || !data[0] || !data[0].attributes?.pageTitle || !data[0].attributes?.metaDesc) return {
-      title: "Jacky FAN - Frontend Developer in Hong Kong",
-      description: "I build websites and eat computer bugs 😉",
-  };
+    if (!data?.[0]?.attributes?.pageTitle || !data[0].attributes?.metaDesc) {
+      return {
+        title: "Jacky FAN - Frontend Developer in Hong Kong",
+        description: "I build websites and eat computer bugs 😉",
+      };
+    }
 
-  return {
+    return {
       title: `Jacky FAN - Frontend Developer in Hong Kong`,
       description: data[0].attributes.metaDesc,
+    }
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+    return {
+      title: "Jacky FAN - Frontend Developer in Hong Kong",
+      description: "I build websites and eat computer bugs 😉",
+    };
   }
 }
 
 async function getData() {
-  const res = await fetch(`${process.env.STRAPI_URL}/api/pages?populate[0]=Contents&populate[1]=Contents.techs&populate[2]=Contents.techs.icon&filters[url][$eqi]=/`);
+  const res = await fetch(
+    `${process.env.STRAPI_URL}/api/pages?populate[0]=Contents&populate[1]=Contents.techs&populate[2]=Contents.techs.icon&filters[url][$eqi]=/`,
+    { next: { revalidate: 3600 } }
+  );
 
   if (!res.ok) {
-      throw new Error("Failed to fetch data");
+    throw new Error("Failed to fetch page data");
   }
 
   return res.json();
 }
 
-
-async function checkPageExist() {
-  const { data } = await getData();
-
-  if (data.length == 0) {
-      revalidatePath(`/`);
-      redirect("/404?from=/");
-  }
-}
-
 export default async function Home() {
+  try {
+    const { data } = await getData();
 
-  const { data } = await getData();
+    if (!data || data.length === 0) {
+      notFound();
+    }
 
-
-  return (
-    <Page reserveNavbarHeight={false}>
-      {getContents(data[0].attributes.Contents)}
-    </Page>
-  )
+    return (
+      <Page reserveNavbarHeight={false}>
+        {getContents(data[0].attributes.Contents)}
+      </Page>
+    )
+  } catch (error) {
+    console.error("Error rendering home page:", error);
+    notFound();
+  }
 }
