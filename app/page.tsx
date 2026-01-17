@@ -1,5 +1,5 @@
 import { Page } from '@/components/basic'
-import { getContents } from '@/helpers/strapi'
+import { getContents } from '@/helpers/strapi/getContent'
 import { revalidatePath } from 'next/cache'
 import { redirect, notFound } from 'next/navigation'
 import type { Metadata, ResolvingMetadata } from 'next'
