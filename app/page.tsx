@@ -5,14 +5,22 @@ import { redirect, notFound } from 'next/navigation'
 import type { Metadata, ResolvingMetadata } from 'next'
 
 export const dynamic = 'force-dynamic';
+const STRAPI_URL = process.env.STRAPI_URL;
 
 type Props = {
   params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  if (!STRAPI_URL) {
+    return {
+      title: "Jacky FAN - Frontend Developer in Hong Kong",
+      description: "I build websites and eat computer bugs 😉",
+    };
+  }
+
   try {
-    const endpoint = `${process.env.STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/`;
+    const endpoint = `${STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/`;
     const response = await fetch(endpoint, { next: { revalidate: 3600 } });
     
     if (!response.ok) throw new Error("Failed to fetch metadata");
@@ -40,8 +48,11 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 }
 
 async function getData() {
+  if (!STRAPI_URL) {
+    return { data: [] } as any;
+  }
   const res = await fetch(
-    `${process.env.STRAPI_URL}/api/pages?populate[0]=Contents&populate[1]=Contents.techs&populate[2]=Contents.techs.icon&filters[url][$eqi]=/`,
+    `${STRAPI_URL}/api/pages?populate[0]=Contents&populate[1]=Contents.techs&populate[2]=Contents.techs.icon&filters[url][$eqi]=/`,
     { next: { revalidate: 3600 } }
   );
 
@@ -53,6 +64,16 @@ async function getData() {
 }
 
 export default async function Home() {
+  if (!STRAPI_URL) {
+    return (
+      <Page reserveNavbarHeight={false}>
+        <div className="py-16 text-center">
+          <p className="text-lg md:text-xl">Content API not configured. Set STRAPI_URL to load dynamic content.</p>
+        </div>
+      </Page>
+    );
+  }
+
   try {
     const { data } = await getData();
 

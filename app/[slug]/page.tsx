@@ -10,11 +10,27 @@ type Props = {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+const STRAPI_URL = process.env.STRAPI_URL;
+
 export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
     const { slug } = await params;
     const url = slug;
 
-    const endpoint = `${process.env.STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/${url}`;
+    if (!STRAPI_URL) {
+        return {
+            title: "Jacky FAN",
+            description: "I build websites and eat computer bugs 😉",
+            openGraph: {
+                title: "Jacky FAN",
+                description: "I build websites and eat computer bugs 😉",
+                siteName: 'Jacky FAN',
+                locale: 'en_US',
+                type: 'website',
+            },
+        };
+    }
+
+    const endpoint = `${STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/${url}`;
     const { data } = await fetch(endpoint).then((res) => res.json())
 
     if (!data || !data[0] || !data[0].attributes?.pageTitle || !data[0].attributes?.metaDesc) return {
@@ -43,7 +59,11 @@ export async function generateMetadata({ params, searchParams }: Props, parent: 
 }
 
 async function getData(url: string) {
-    const res = await fetch(`${process.env.STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/${url}`);
+    if (!STRAPI_URL) {
+        return { data: [] } as any;
+    }
+
+    const res = await fetch(`${STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/${url}`);
 
     if (!res.ok) {
         throw new Error("Failed to fetch data");
@@ -69,6 +89,17 @@ async function checkPageExist(params: { slug: string }) {
 
 export default async function NormalPage ({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
+
+    if (!STRAPI_URL) {
+        return (
+            <Page>
+                <SectionContainer>
+                    <p className="text-lg md:text-xl">Content API not configured. Set STRAPI_URL to load this page.</p>
+                </SectionContainer>
+            </Page>
+        );
+    }
+
     await checkPageExist({ slug });
 
     const { data } = await getData(slug);

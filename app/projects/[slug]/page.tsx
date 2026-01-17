@@ -14,11 +14,27 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
+const STRAPI_URL = process.env.STRAPI_URL;
+
 export async function generateMetadata( { params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
   const { slug } = await params;
   const alias = slug;
+
+    if (!STRAPI_URL) {
+        return {
+            title: "Jacky FAN",
+            description: "I build websites and eat computer bugs 😉",
+            openGraph: {
+                    title: "Jacky FAN",
+                    description: "I build websites and eat computer bugs 😉",
+                    siteName: 'Jacky FAN',
+                    locale: 'en_US',
+                    type: 'website',
+            },
+        };
+    }
   
-  const endpoint = `${process.env.STRAPI_URL}/api/projects?populate=*&filters[alias][$eqi]=${alias}`;
+    const endpoint = `${STRAPI_URL}/api/projects?populate=*&filters[alias][$eqi]=${alias}`;
   const { data } = await fetch(endpoint).then((res) => res.json())
 
   if (!data || !data[0] || !data[0].attributes?.title) return {
@@ -47,7 +63,11 @@ export async function generateMetadata( { params, searchParams }: Props, parent:
 }
 
 async function getData(alias: string) {
-    const res = await fetch(`${process.env.STRAPI_URL}/api/projects?populate=*&filters[alias][$eqi]=${alias}`);
+    if (!STRAPI_URL) {
+        return { data: [] } as any;
+    }
+
+    const res = await fetch(`${STRAPI_URL}/api/projects?populate=*&filters[alias][$eqi]=${alias}`);
 
     if (!res.ok) {
         throw new Error("Failed to fetch data");
@@ -59,6 +79,16 @@ async function getData(alias: string) {
 export default async function ProjectDescPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const alias = slug;
+
+    if (!STRAPI_URL) {
+        return (
+            <Page>
+                <SectionContainer>
+                    <p className="text-lg md:text-xl">Content API not configured. Set STRAPI_URL to load this project.</p>
+                </SectionContainer>
+            </Page>
+        );
+    }
 
     const { data } = await getData(alias);
 
