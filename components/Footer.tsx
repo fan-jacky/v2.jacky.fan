@@ -3,6 +3,10 @@ import Link from "next/link";
 
 export default function Footer({ siteSetting }: { siteSetting: any }) {
     
+    if (!siteSetting || !siteSetting.attributes) {
+        return null;
+    }
+
     const footerDescClasses = [
         "prose max-w-none", // prose class
         "prose-p:text-sm prose-p:m-0 prose-p:!leading-0 prose-p:text-base-content", // p class
@@ -18,7 +22,7 @@ export default function Footer({ siteSetting }: { siteSetting: any }) {
         <footer className="footer footer-center p-10 bg-base-300 text-base-content rounded">
             <div>
                 <ul className="menu menu-horizontal">
-                    {siteSetting.attributes.quickLinks.map((link: any, index: number) => (
+                    {siteSetting.attributes.quickLinks?.map((link: any, index: number) => (
                         <li key={index}>
                             <Link href={link.url} className="link link-primary no-underline" target="_blank">{link.name}</Link>
                         </li>
@@ -26,7 +30,7 @@ export default function Footer({ siteSetting }: { siteSetting: any }) {
                 </ul>
             </div>
             <div className={footerDescClasses}>
-                { siteSetting.attributes.footerText.map((t: any, i: number) => getRichTextBlocks(t, {}, i)) }
+                { siteSetting.attributes.footerText?.map((t: any, i: number) => getRichTextBlocks(t, {}, i)) }
             </div>
         </footer>
     );

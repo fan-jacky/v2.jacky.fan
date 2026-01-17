@@ -16,6 +16,10 @@ export default function Navbar({ siteSetting }: { siteSetting: any }) {
 
     const navbarRef = useRef<HTMLDivElement | null>(null);
 
+    if (!siteSetting || !siteSetting.attributes) {
+        return null;
+    }
+
     useEffect(() => {
         const navbarHeight = navbarRef.current?.offsetHeight ?? 0;
         document.querySelector("html")?.style.setProperty("--navbar-height", `${navbarHeight}px`);
@@ -40,11 +44,11 @@ export default function Navbar({ siteSetting }: { siteSetting: any }) {
             <div className="flex-none hidden md:flex md:mx-5">
                 <ul className="menu menu-horizontal px-1">
                     {siteSetting.attributes.showNightModeToggle && <li className="hidden md:flex"><ToggleDayNight /></li>}
-                    {siteSetting.attributes.menuItem.map((item: any, index: number) => (
+                    {siteSetting.attributes.menuItem?.filter((item: any) => item.page?.data?.attributes?.url).map((item: any, index: number) => (
                         <li key={index} className="hidden md:flex">
                             <ActiveLink href={item.page.data.attributes.url}>{item.name}</ActiveLink>
-                        </li>)
-                    )}
+                        </li>
+                    ))}
                     {siteSetting.attributes.showMenuQuickLinksMenu &&
                         <li className="hidden md:flex">
                             <details>
@@ -52,7 +56,7 @@ export default function Navbar({ siteSetting }: { siteSetting: any }) {
                                     Quick Links
                                 </summary>
                                 <ul className="p-2 bg-base-100">
-                                    {siteSetting.attributes.quickLinks.map((link: any, index: number) => (
+                                    {siteSetting.attributes.quickLinks?.map((link: any, index: number) => (
                                         <li key={index}>
                                             <Link href={link.url} target="_blank">{link.name}</Link>
                                         </li>
@@ -77,18 +81,18 @@ export default function Navbar({ siteSetting }: { siteSetting: any }) {
 
                             {/* Mobile Page Menu */}
                             <p className="ml-4 my-4 font-bold">Pages</p>
-                            {siteSetting.attributes.menuItem.map((item: any, index: number) => (
+                            {siteSetting.attributes.menuItem?.filter((item: any) => item.page?.data?.attributes?.url).map((item: any, index: number) => (
                                 <li key={index}>
                                     <ActiveLink href={item.page.data.attributes.url}>{item.name}</ActiveLink>
-                                </li>)
-                            )}
+                                </li>
+                            ))}
 
                             {/* Mobile Quick Links */}
                             {siteSetting.attributes.showMenuQuickLinksMenu && <>
                                 <hr className="border-base-content my-4 ml-4 mr-8" />
                                 <p className="ml-4 my-4 font-bold">Quick Links</p>
                             </>}
-                            {siteSetting.attributes.showMenuQuickLinksMenu && siteSetting.attributes.quickLinks.map((link: any, index: number) => (
+                            {siteSetting.attributes.showMenuQuickLinksMenu && siteSetting.attributes.quickLinks?.map((link: any, index: number) => (
                                 <li key={index}>
                                     <Link href={link.url} target="_blank">{link.name}</Link>
                                 </li>

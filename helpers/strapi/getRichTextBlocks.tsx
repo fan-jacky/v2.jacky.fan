@@ -1,6 +1,8 @@
 import { ActiveLink } from "@/components/basic";
 
 function getTextStyles(text: any, attrs: any = {}) {
+  if (!text) return null;
+  
   if (text.bold == true) {
     return <strong {...attrs} key={attrs.key ?? ""}>{text.text}</strong>;
   }
@@ -16,10 +18,10 @@ function getTextStyles(text: any, attrs: any = {}) {
   if (text.code == true) {
     return <code {...attrs} key={attrs.key ?? ""}>{text.text}</code>;
   }
-  if (text.url) {
+  if (text.url && text.children) {
     return <ActiveLink {...attrs} key={attrs.key ?? ""} href={text.url}>{text.children.map((c:any) => getTextStyles(c))}</ActiveLink>;
   }
-  return text.text;
+  return text.text ?? null;
 }
 
 function getList(list: any, key: number) {
@@ -78,12 +80,12 @@ function getList(list: any, key: number) {
     return <li key={key}>{elements}</li>;
   }
 
-  return <></>;
+  return null;
 
 }
 
 function getRichTextBlocks(block: any, attrs: any = {}, key: number) {
-  if (!block || !block.type) return <></>;
+  if (!block || !block.type) return null;
 
   if (block.type == "heading") {
     const { level, children } = block;
@@ -146,7 +148,7 @@ function getRichTextBlocks(block: any, attrs: any = {}, key: number) {
     return getList(block, key);
   }
 
-  return <></>
+  return null
 }
 
 export { getRichTextBlocks };
