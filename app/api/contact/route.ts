@@ -1,6 +1,3 @@
-import { Databases, ID } from "appwrite";
-import { client } from "@/app/appwrite";
-
 interface ContactRequest {
   name: string;
   email: string;
@@ -41,22 +38,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save to Appwrite database
-    const databases = new Databases(client);
-    await databases.createDocument(
-      process.env.APPWRITE_DB_ID || "contacts",
-      process.env.APPWRITE_COLLECTION_ID || "contact_messages",
-      ID.unique(),
-      {
-        name,
-        email,
-        message,
-        createdAt: new Date().toISOString(),
-      }
-    );
-
     return new Response(
-      JSON.stringify({ success: true, message: "Message saved successfully" }),
+      JSON.stringify({ success: true, message: "Message received" }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
