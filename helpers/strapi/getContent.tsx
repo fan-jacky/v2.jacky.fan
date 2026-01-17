@@ -7,108 +7,130 @@ import { ArrowSmallDownIcon } from "@heroicons/react/24/outline";
 import { ProjectGrid } from "@/components/home/projects";
 import { ContactForm, Letter3D } from "@/components/home";
 import { AboutMeSection, HeroSection } from "@/components/home/sections";
+import type { PageContentType } from "@/interfaces/ContentBlockProps";
 
-function getContents(data: any) {
+function getContents(data: PageContentType[] | null | undefined) {
+    if (!data || !Array.isArray(data)) return <></>;
 
-    if (!data) return <></>
+    return data.map((block: PageContentType, i: number) => {
+        switch (block.__component) {
+            case "page.page-rich-text": {
+                const classes = [
+                    "prose max-w-none",
+                    "prose-p:text-md prose-p:md:text-xl prose-p:md:8 prose-p:!leading-8 prose-p:text-base-content",
+                    "prose-h2:text-xl prose-h2:md:text-3xl prose-h2:font-bold prose-h2:mt-8 prose-h2:md:mt-16 prose-h2:mb-4 prose-h2:md:mb-8",
+                    "prose-h3:text-lg prose-h3:md:text-2xl prose-h3:font-bold prose-h3:mt-8 prose-h3:md:mt-16 prose-h3:mb-4 prose-h3:md:mb-8",
+                    "prose-ul:list-disc prose-ul:text-md prose-ul:md:text-xl prose-ul:ps-8 prose-ul:!leading-8 prose-ul:mb-4 prose-ul:md:mb-8 prose-ul:text-base-content",
+                    "prose-li:m-0 prose-li:p-0",
+                    "prose-a:link prose-a:link-primary"
+                ].join(" ");
 
-    return data.map((block: any, i: number) => {
-        if (block.__component === "page.page-rich-text") {
-
-            const classes = [
-                "prose max-w-none", // prose class
-                "prose-p:text-md prose-p:md:text-xl prose-p:md:8 prose-p:!leading-8 prose-p:text-base-content", // p class
-                "prose-h2:text-xl prose-h2:md:text-3xl prose-h2:font-bold prose-h2:mt-8 prose-h2:md:mt-16 prose-h2:mb-4 prose-h2:md:mb-8", // h2 class
-                "prose-h3:text-lg prose-h3:md:text-2xl prose-h3:font-bold prose-h3:mt-8 prose-h3:md:mt-16 prose-h3:mb-4 prose-h3:md:mb-8", // h3 class
-                "prose-ul:list-disc prose-ul:text-md prose-ul:md:text-xl prose-ul:ps-8 prose-ul:!leading-8 prose-ul:mb-4 prose-ul:md:mb-8 prose-ul:text-base-content ", // ul class
-                "prose-li:m-0 prose-li:p-0", // li class
-                "prose-a:link prose-a:link-primary"  // a class
-            ].join(" ");
-
-            return <SectionContainer key={i}>
-                <FadeInBottom>
-                    <div className={classes}>
-                        {block.content.map((c: any, i: number) => getRichTextBlocks(c, {}, i))}
-                    </div>
-                </FadeInBottom>
-            </SectionContainer>
-        }
-
-        if (block.__component === "page.page-heading") {
-            return <SectionContainer bottomSpacing={false} key={i}>
-                <FadeInBottom>
-                    <Heading topTitle={block.topTitle} leftTitle={block.leftTitle} rightTitle={block.rightTitle} colorReverse={block.colorReverse} />
-                </FadeInBottom>
-            </SectionContainer>
-        }
-
-        if (block.__component === "page.button") {
-            if (block.external) {
-                return <SectionContainer topSpacing={false} bottomSpacing={false} key={i}>
-                    <FadeInBottom>
-                        <Link href={block.url} className="btn btn-neutral">
-                            {block.name}
-                            <ArrowSmallDownIcon className="h-6 w-6 text-content -rotate-90" />
-                        </Link>
-                    </FadeInBottom>
-                </SectionContainer>
-            } else {
-                return <SectionContainer key={i}>
-                    <FadeInBottom>
-                        <ActiveLink href={block.url} className="btn btn-neutral">
-                            {block.name}
-                            <ArrowSmallDownIcon className="h-6 w-6 text-content -rotate-90" />
-                        </ActiveLink>
-                    </FadeInBottom>
-                </SectionContainer>
+                return (
+                    <SectionContainer key={i}>
+                        <FadeInBottom>
+                            <div className={classes}>
+                                {block.content.map((c: any, idx: number) => getRichTextBlocks(c, {}, idx))}
+                            </div>
+                        </FadeInBottom>
+                    </SectionContainer>
+                );
             }
-        }
 
-        if (block.__component === "page.project-grid") {
-            return <ProjectGrid key={i} />
-        }
+            case "page.page-heading":
+                return (
+                    <SectionContainer bottomSpacing={false} key={i}>
+                        <FadeInBottom>
+                            <Heading 
+                                topTitle={block.topTitle} 
+                                leftTitle={block.leftTitle} 
+                                rightTitle={block.rightTitle} 
+                                colorReverse={block.colorReverse}
+                            />
+                        </FadeInBottom>
+                    </SectionContainer>
+                );
 
-        if (block.__component === "page.contact-form") {
-            return <SectionContainer key={i}>
-                <FadeInBottom>
-                    <p className="font-bold text-xl md:text-3xl mt-8 md:mt-16 mb-4 md:mb-8">{block.title}</p>
-                    <div className="card w-full bg-base-300 shadow-xl">
-                        <div className="card-body">
-                            <ContactForm />
-                        </div>
-                    </div>
-                </FadeInBottom>
-            </SectionContainer>
-        }
+            case "page.button": {
+                const buttonContent = (
+                    <>
+                        {block.name}
+                        <ArrowSmallDownIcon className="h-6 w-6 text-content -rotate-90" />
+                    </>
+                );
 
-        if (block.__component === "page.3-d-letter") {
-            if (block.enable) {
-                return <Letter3D key={i} />
-            } else {
-                return <></>
+                if (block.external) {
+                    return (
+                        <SectionContainer topSpacing={false} bottomSpacing={false} key={i}>
+                            <FadeInBottom>
+                                <Link href={block.url} className="btn btn-neutral">
+                                    {buttonContent}
+                                </Link>
+                            </FadeInBottom>
+                        </SectionContainer>
+                    );
+                }
+                return (
+                    <SectionContainer key={i}>
+                        <FadeInBottom>
+                            <ActiveLink href={block.url} className="btn btn-neutral">
+                                {buttonContent}
+                            </ActiveLink>
+                        </FadeInBottom>
+                    </SectionContainer>
+                );
             }
-        }
 
-        if (block.__component === "page.hero-section") {
-            return <HeroSection title={block.title} desc={block.desc} arrowText={block.arrowText} arrowLink={block.arrowLink} key={i}/>
-        }
+            case "page.project-grid":
+                return <ProjectGrid key={i} />;
 
-        if (block.__component === "page.about-me-section") {
-            return <AboutMeSection
-                topTitle={block.topTitle}
-                leftTitle={block.leftTitle}
-                rightTitle={block.rightTitle}
-                contents={block.contents.map((c: any, i: number) => getRichTextBlocks(c, {}, i))}
-                techs={block.techs}
-                btnLinks={block.btnLinks}
-                btnText={block.btnText}
-                key={i}
-            />
-        }
+            case "page.contact-form":
+                return (
+                    <SectionContainer key={i}>
+                        <FadeInBottom>
+                            <p className="font-bold text-xl md:text-3xl mt-8 md:mt-16 mb-4 md:mb-8">
+                                {block.title}
+                            </p>
+                            <div className="card w-full bg-base-300 shadow-xl">
+                                <div className="card-body">
+                                    <ContactForm />
+                                </div>
+                            </div>
+                        </FadeInBottom>
+                    </SectionContainer>
+                );
 
-        return <></>
+            case "page.3-d-letter":
+                return block.enable ? <Letter3D key={i} /> : null;
+
+            case "page.hero-section":
+                return (
+                    <HeroSection 
+                        title={block.title} 
+                        desc={block.desc} 
+                        arrowText={block.arrowText} 
+                        arrowLink={block.arrowLink} 
+                        key={i}
+                    />
+                );
+
+            case "page.about-me-section":
+                return (
+                    <AboutMeSection
+                        topTitle={block.topTitle}
+                        leftTitle={block.leftTitle}
+                        rightTitle={block.rightTitle}
+                        contents={block.contents.map((c: any, idx: number) => getRichTextBlocks(c, {}, idx))}
+                        techs={block.techs}
+                        btnLinks={block.btnLinks}
+                        btnText={block.btnText}
+                        key={i}
+                    />
+                );
+
+            default:
+                return null;
+        }
     });
-
 }
 
-export { getContents }
+export { getContents };

@@ -1,7 +1,7 @@
 import { log } from "console";
 import FadeInBottom from "../animation/FadeInBottom";
 import { Heading } from "../visual";
-import { getRichTextBlocks } from "@/helpers/strapi";
+import { getRichTextBlocks } from "@/helpers/strapi/getRichTextBlocks";
 import { get } from "http";
 
 async function getData() {
