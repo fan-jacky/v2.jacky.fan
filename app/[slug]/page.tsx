@@ -6,12 +6,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from 'next/navigation'
 
 type Props = {
-    params: { slug: string }
-    searchParams: { [key: string]: string | string[] | undefined }
+    params: Promise<{ slug: string }>
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
-    const url = params.slug;
+    const { slug } = await params;
+    const url = slug;
 
     const endpoint = `${process.env.STRAPI_URL}/api/pages?populate=*&filters[url][$eqi]=/${url}`;
     const { data } = await fetch(endpoint).then((res) => res.json())
@@ -66,11 +67,11 @@ async function checkPageExist(params: { slug: string }) {
     }
 }
 
-export default async function NormalPage ({ params }: { params: { slug: string } }) {
+export default async function NormalPage ({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    await checkPageExist({ slug });
 
-    await checkPageExist(params);
-
-    const { data } = await getData(params.slug);
+    const { data } = await getData(slug);
 
     return (
         <>
@@ -82,5 +83,3 @@ export default async function NormalPage ({ params }: { params: { slug: string }
 
     );
 }
-
-export const runtime = 'edge';

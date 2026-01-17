@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache'
 import { redirect, notFound } from 'next/navigation'
 import type { Metadata, ResolvingMetadata } from 'next'
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {

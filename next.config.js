@@ -6,6 +6,7 @@ const nextConfig = {
     RECAPTCHA_SITE_KEY: process.env.RECAPTCHA_SITE_KEY,
   },
   reactStrictMode: true,
+  turbopack: {},
   webpack: function (config) {
     config.module.rules.push({
       test: /\.md$/,

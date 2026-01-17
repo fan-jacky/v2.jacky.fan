@@ -10,12 +10,13 @@ import BgHeading from "@/components/visual/bgHeading";
 import type { Metadata, ResolvingMetadata } from 'next'
 
 type Props = {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export async function generateMetadata( { params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
-  const alias = params.slug;
+  const { slug } = await params;
+  const alias = slug;
   
   const endpoint = `${process.env.STRAPI_URL}/api/projects?populate=*&filters[alias][$eqi]=${alias}`;
   const { data } = await fetch(endpoint).then((res) => res.json())
@@ -55,8 +56,9 @@ async function getData(alias: string) {
     return res.json();
 }
 
-export default async function ProjectDescPage({ params }: { params: { slug: string } }) {
-    const alias = params.slug;
+export default async function ProjectDescPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const alias = slug;
 
     const { data } = await getData(alias);
 
@@ -119,5 +121,3 @@ export default async function ProjectDescPage({ params }: { params: { slug: stri
         </>
     );
 }
-
-export const runtime = 'edge';
